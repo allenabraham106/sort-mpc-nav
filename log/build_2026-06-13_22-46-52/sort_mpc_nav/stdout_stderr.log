@@ -1,0 +1,70 @@
+[ 50%] [32mBuilding CXX object CMakeFiles/pedestrian_sim.dir/src/pedestrian_sim.cpp.o[0m
+In file included from [01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:1[m[K:
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/include/sort_mpc_nav/pedestrian_sim.hpp:8:6:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K;[m[K’ after struct definition
+    8 |     }
+      |      [01;31m[K^[m[K
+      |      [32m[K;[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/include/sort_mpc_nav/pedestrian_sim.hpp:10:11:[m[K [01;31m[Kerror: [m[Kredefinition of ‘[01m[Kclass sort_mpc_nav::Pedestrian[m[K’
+   10 |     class [01;31m[KPedestrian[m[K : public rclcpp::Node{
+      |           [01;31m[K^~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/include/sort_mpc_nav/pedestrian_sim.hpp:5:12:[m[K [01;36m[Knote: [m[Kprevious definition of ‘[01m[Kclass sort_mpc_nav::Pedestrian[m[K’
+    5 |     struct [01;36m[KPedestrian[m[K{
+      |            [01;36m[K^~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:4:3:[m[K [01;31m[Kerror: [m[K‘[01m[KPedestrianSim[m[K’ does not name a type; did you mean ‘[01m[KPedestrian[m[K’?
+    4 |   [01;31m[KPedestrianSim[m[K::PedestrianSim() : Node("pedestrian_sim"){
+      |   [01;31m[K^~~~~~~~~~~~~[m[K
+      |   [32m[KPedestrian[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:25:8:[m[K [01;31m[Kerror: [m[K‘[01m[KPedestrianSim[m[K’ has not been declared
+   25 |   void [01;31m[KPedestrianSim[m[K::Update(){
+      |        [01;31m[K^~~~~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:[m[K In function ‘[01m[Kvoid sort_mpc_nav::[01;32m[KUpdate[m[K()[m[K’:
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:26:9:[m[K [01;31m[Kerror: [m[K‘[01m[Ksize_t[m[K’ was not declared in this scope
+   26 |     for([01;31m[Ksize_t[m[K i = 0; i < pedestrians_.size(); ++i){
+      |         [01;31m[K^~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:2:1:[m[K [01;36m[Knote: [m[K‘[01m[Ksize_t[m[K’ is defined in header ‘[01m[K<cstddef>[m[K’; did you forget to ‘[01m[K#include <cstddef>[m[K’?
+    1 | #include "sort_mpc_nav/pedestrian_sim.hpp"
+  +++ |+[32m[K#include <cstddef>[m[K
+    2 | 
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:26:23:[m[K [01;31m[Kerror: [m[K‘[01m[Ki[m[K’ was not declared in this scope
+   26 |     for(size_t i = 0; [01;31m[Ki[m[K < pedestrians_.size(); ++i){
+      |                       [01;31m[K^[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:26:27:[m[K [01;31m[Kerror: [m[K‘[01m[Kpedestrians_[m[K’ was not declared in this scope; did you mean ‘[01m[KPedestrian[m[K’?
+   26 |     for(size_t i = 0; i < [01;31m[Kpedestrians_[m[K.size(); ++i){
+      |                           [01;31m[K^~~~~~~~~~~~[m[K
+      |                           [32m[KPedestrian[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:32:7:[m[K [01;31m[Kerror: [m[K‘[01m[Kgeometry_msgs[m[K’ has not been declared
+   32 |       [01;31m[Kgeometry_msgs[m[K::msg::Point msg;
+      |       [01;31m[K^~~~~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:33:7:[m[K [01;31m[Kerror: [m[K‘[01m[Kmsg[m[K’ was not declared in this scope
+   33 |       [01;31m[Kmsg[m[K.x = pedestrians_[i].x;
+      |       [01;31m[K^~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:36:7:[m[K [01;31m[Kerror: [m[K‘[01m[Kpublishers_[m[K’ was not declared in this scope
+   36 |       [01;31m[Kpublishers_[m[K[i]->publish(msg);
+      |       [01;31m[K^~~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:[m[K In function ‘[01m[Kint[01;32m[K main[m[K(int, char**)[m[K’:
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:42:3:[m[K [01;31m[Kerror: [m[K‘[01m[Krclcpp[m[K’ has not been declared
+   42 |   [01;31m[Krclcpp[m[K::init(argc, argv);
+      |   [01;31m[K^~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:43:3:[m[K [01;31m[Kerror: [m[K‘[01m[Krclcpp[m[K’ has not been declared
+   43 |   [01;31m[Krclcpp[m[K::spin(std::make_shared<sort_mpc_nav::PedestrianSim>());
+      |   [01;31m[K^~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:43:21:[m[K [01;31m[Kerror: [m[K‘[01m[Kmake_shared[m[K’ is not a member of ‘[01m[Kstd[m[K’
+   43 |   rclcpp::spin(std::[01;31m[Kmake_shared[m[K<sort_mpc_nav::PedestrianSim>());
+      |                     [01;31m[K^~~~~~~~~~~[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:2:1:[m[K [01;36m[Knote: [m[K‘[01m[Kstd::make_shared[m[K’ is defined in header ‘[01m[K<memory>[m[K’; did you forget to ‘[01m[K#include <memory>[m[K’?
+    1 | #include "sort_mpc_nav/pedestrian_sim.hpp"
+  +++ |+[32m[K#include <memory>[m[K
+    2 | 
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:43:47:[m[K [01;31m[Kerror: [m[K‘[01m[KPedestrianSim[m[K’ is not a member of ‘[01m[Ksort_mpc_nav[m[K’; did you mean ‘[01m[KPedestrian[m[K’?
+   43 |   rclcpp::spin(std::make_shared<sort_mpc_nav::[01;31m[KPedestrianSim[m[K>());
+      |                                               [01;31m[K^~~~~~~~~~~~~[m[K
+      |                                               [32m[KPedestrian[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:43:62:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K)[m[K’ token
+   43 |   rclcpp::spin(std::make_shared<sort_mpc_nav::PedestrianSim>([01;31m[K)[m[K);
+      |                                                              [01;31m[K^[m[K
+[01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:44:3:[m[K [01;31m[Kerror: [m[K‘[01m[Krclcpp[m[K’ has not been declared
+   44 |   [01;31m[Krclcpp[m[K::shutdown();
+      |   [01;31m[K^~~~~~[m[K
+gmake[2]: *** [CMakeFiles/pedestrian_sim.dir/build.make:76: CMakeFiles/pedestrian_sim.dir/src/pedestrian_sim.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/pedestrian_sim.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

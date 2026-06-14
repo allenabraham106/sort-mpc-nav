@@ -1,21 +1,25 @@
 #ifndef SORT_MPC_NAV__PEDESTRIAN_SIM_HPP_
 #define SORT_MPC_NAV__PEDESTRIAN_SIM_HPP_
 
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <vector>
+
 namespace sort_mpc_nav{
     struct Pedestrian{
         double x, y;
         double vx, vy;
-    }
+    };
 
-    class Pedestrian : public rclcpp::Node{
+    class PedestrianSim : public rclcpp::Node{
         public: 
-            PedestrianSim()
+            PedestrianSim();
         private:
-            void update():
+            void update();
 
             std::vector<Pedestrian> pedestrians_; // listening to the pedestrian struct from above
             std::vector<rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr> publishers_; // publsiher per pedestrian
-            rclcpp::TimerBase::SharedPtr timer_ // drives the whole program
+            rclcpp::TimerBase::SharedPtr timer_; // drives the whole program
     };
 } // namespace sort_mpc_nav
 

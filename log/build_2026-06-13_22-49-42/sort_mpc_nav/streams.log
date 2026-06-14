@@ -1,0 +1,14 @@
+[0.006s] Invoking command in '/home/allenabraham106/ros2_ws/src/sort_mpc_nav/build/sort_mpc_nav': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/allenabraham106/ros2_ws/src/sort_mpc_nav/build/sort_mpc_nav -- -j4 -l4
+[0.047s] [ 50%] [32mBuilding CXX object CMakeFiles/pedestrian_sim.dir/src/pedestrian_sim.cpp.o[0m
+[1.009s] [01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:25:8:[m[K [01;31m[Kerror: [m[Kno declaration matches ‘[01m[Kvoid sort_mpc_nav::PedestrianSim::[01;32m[KUpdate[m[K()[m[K’
+[1.009s]    25 |   void [01;31m[KPedestrianSim[m[K::Update(){
+[1.009s]       |        [01;31m[K^~~~~~~~~~~~~[m[K
+[1.009s] [01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:25:8:[m[K [01;36m[Knote: [m[Kno functions named ‘[01m[Kvoid sort_mpc_nav::PedestrianSim::[01;32m[KUpdate[m[K()[m[K’
+[1.009s] In file included from [01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/src/pedestrian_sim.cpp:1[m[K:
+[1.009s] [01m[K/home/allenabraham106/ros2_ws/src/sort_mpc_nav/include/sort_mpc_nav/pedestrian_sim.hpp:14:11:[m[K [01;36m[Knote: [m[K‘[01m[Kclass sort_mpc_nav::PedestrianSim[m[K’ defined here
+[1.009s]    14 |     class [01;36m[KPedestrianSim[m[K : public rclcpp::Node{
+[1.009s]       |           [01;36m[K^~~~~~~~~~~~~[m[K
+[1.408s] gmake[2]: *** [CMakeFiles/pedestrian_sim.dir/build.make:76: CMakeFiles/pedestrian_sim.dir/src/pedestrian_sim.cpp.o] Error 1
+[1.408s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/pedestrian_sim.dir/all] Error 2
+[1.408s] gmake: *** [Makefile:146: all] Error 2
+[1.411s] Invoked command in '/home/allenabraham106/ros2_ws/src/sort_mpc_nav/build/sort_mpc_nav' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/allenabraham106/ros2_ws/src/sort_mpc_nav/build/sort_mpc_nav -- -j4 -l4
