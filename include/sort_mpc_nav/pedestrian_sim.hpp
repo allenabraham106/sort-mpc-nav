@@ -3,6 +3,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 #include <vector>
 
 namespace sort_mpc_nav{
@@ -20,6 +21,7 @@ namespace sort_mpc_nav{
             std::vector<Pedestrian> pedestrians_; // listening to the pedestrian struct from above
             std::vector<rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr> publishers_; // publsiher per pedestrian
             rclcpp::TimerBase::SharedPtr timer_; // drives the whole program
+            rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_; // draw the sphere and shapes at that location
     };
 } // namespace sort_mpc_nav
 

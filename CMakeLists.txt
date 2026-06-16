@@ -13,11 +13,16 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 include_directories(include)
 
 add_executable(pedestrian_sim src/pedestrian_sim.cpp)
-ament_target_dependencies(pedestrian_sim rclcpp geometry_msgs)
+ament_target_dependencies(pedestrian_sim 
+  rclcpp
+  geometry_msgs
+  visualization_msgs
+)
 
 install(TARGETS
   pedestrian_sim
