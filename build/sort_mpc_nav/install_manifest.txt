@@ -1,4 +1,5 @@
 /home/allenabraham106/ros2_ws/src/sort_mpc_nav/install/sort_mpc_nav/lib/sort_mpc_nav/pedestrian_sim
+/home/allenabraham106/ros2_ws/src/sort_mpc_nav/install/sort_mpc_nav/share/sort_mpc_nav/launch/sim.launch.py
 /home/allenabraham106/ros2_ws/src/sort_mpc_nav/install/sort_mpc_nav/share/ament_index/resource_index/package_run_dependencies/sort_mpc_nav
 /home/allenabraham106/ros2_ws/src/sort_mpc_nav/install/sort_mpc_nav/share/ament_index/resource_index/parent_prefix_path/sort_mpc_nav
 /home/allenabraham106/ros2_ws/src/sort_mpc_nav/install/sort_mpc_nav/share/sort_mpc_nav/environment/ament_prefix_path.sh

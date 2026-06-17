@@ -67,6 +67,13 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/sort_mpc_nav" TYPE DIRECTORY FILES
+    "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/launch"
+    "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/config"
+    )
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/package_run_dependencies" TYPE FILE FILES "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/build/sort_mpc_nav/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/sort_mpc_nav")
 endif()
 

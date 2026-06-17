@@ -57,6 +57,15 @@ namespace sort_mpc_nav{
       marker.color.g = 0.3f;
       marker.color.b = 0.0f;
       marker.color.a = 1.0f;
+
+      // boundary checks for the pedestrians to bounce
+      if(pedestrians_[i].x > 5.0 || pedestrians_[i].x <-5.0){
+        pedestrians_[i].vx *= -1.0;
+      }
+
+      if(pedestrians_[i].y > 5.0 || pedestrians_[i].y < -5.0){
+        pedestrians_[i].vy *= -1.0;
+      }
       
       publishers_[i]->publish(msg);
       marker_array.markers.push_back(marker);
