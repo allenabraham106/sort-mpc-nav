@@ -7,7 +7,46 @@ import numpy as np
 
 class SortTracker(Node):
     def __init__(self):
-        super().__init__('sort_tracker')\
+        super().__init__('sort_tracker')
+        self.num_pedestrians = 3
+        self.callback_group = ReentrantCallbackGroup
+
+        # one kalman filter per pedestrian
+        self.filters = [self.init_kalman_filter for _ in range(self.num_pedestrians)]
+
+        # track if the pedestrain has received its first measurment
+        self.initialized = [False] * self.num_pedestrians
+
+        # subscribers (one per pedestrian)
+        self.subscribers = []
+        for i in range(self.num_pedestrians):
+            sub = self.create_subscription(
+                Point,
+                f'/pedestrian_{i}/pose',
+                lambda msg, idx = i: self.pose_callback(msg, idx),
+                10,
+                callback_group = self.callback_group
+            )
+        
+        # publishers (one per pedestrian)
+        # publishing pose and velocity
+        self.pose_publishers = []
+        self.vel_publishers = []
+        for u in range(self.nume_pedestrians):
+            pose_pub = self.create_publisher(
+                Point,
+                f'/tracked_{u}/pose',
+                10
+            )
+            vel_pub = self.create_publisher(
+                Point, 
+                f'/tracked_{u}/velocity',
+                10
+            )
+            self.pose_publishers.append(pose_pub)
+            self.vel_publishers.append(vel_pub)
+
+        self.get_logger().info('SORT tracker started')
 
     def init_kalman_filter(self):
         kf = KalmanFilter(dim_x = 4, dim_z = 2)
