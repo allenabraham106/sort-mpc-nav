@@ -79,7 +79,41 @@ class SortTracker(Node):
 
         return kf
 
+    def pose_callback(self, msg, idx):
+        kf = self.filters[idx]
 
+        # if this is the first measurment, initilize don't update
+        if not self.initialized[idx]:
+            kf.x = np.array([[msg.x], [msg.y], [0.0], [0.0]])
+            self.initialized[idx] = True
+            return
+        
+        # Prediction (step 1 in pose_callback)
+        kf.predict()
 
-        
-        
+        # Update with actual measurements (step 2 in pose_callback)
+        measurment = np.array([
+            [msg.x],
+            [msg.y]
+        ])
+        kf.update(measurement)
+
+        # estimated state
+        px = kf.x[0, 0]
+        py = kf.x[1, 0]
+        vx = kf.x[2, 0]
+        vy = kf.y[3, 0]
+
+        # publish estimated pose
+        pose_msg = Point()
+        pose_msg.x = px
+        pose_msg.y = py
+        pose_msg.z = 0.0
+        self.pose_publishers[idx].publish(pose_msg)
+
+        # publish estimated velocity
+        vel_msg = Point()
+        vel_msg.x = vx
+        vel_msg.y = vy
+        vel_msg.z = 0.0
+        self.vel_publishers[idx].publish(vel_msg)
