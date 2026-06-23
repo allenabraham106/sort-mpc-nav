@@ -33,7 +33,7 @@ def generate_launch_description():
             name = 'rviz2',
             arguments = ['-d', rviz_config],
             output = 'screen'
-        )
+        ),
 
         Node(
             package = 'sort_mpc_nav',
