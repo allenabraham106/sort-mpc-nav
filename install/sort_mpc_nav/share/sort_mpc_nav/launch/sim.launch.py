@@ -35,4 +35,11 @@ def generate_launch_description():
             output = 'screen'
         )
 
+        Node(
+            package = 'sort_mpc_nav',
+            executable = 'sort_tracker.py',
+            name = 'sort_tracker',
+            output = 'screen'
+        )
+
     ])
