@@ -10,3 +10,41 @@ import casadi as ca # this is for trajectory planning
 class MPC_Planner(Node):
     def __init__(self):
         super().__init__('mpc_planner')
+        self.robot_x = 0.0 # where the robot is
+        self.robot_y = 0.0
+        self.goal_x = None # where the user clicked (none until clicked)
+        self.goal_y = None
+        self.ped_states = {} # latest positiion + velocity of the pedestrians
+        self.num_pedestrians = 3
+
+        # Subscribers for each pedestrians
+        self.subscribers = []
+        for i in range(self.num_pedestrians):
+            pose_sub = self.create_subscription(
+                Point, 
+                f'/tracked_{i}/pose',
+                lambda msg, idx=i: self.pose_callback(msg, idx),
+                10     
+            )
+            vel_sub = self.create_subscription(
+                Point, 
+                f'/tracked_{i}/velocity',
+                lambda msg, idx=i: self.vel_callback(msg, idx),
+                10
+            )
+            self.subscribers.append(pose_sub)
+            self.subscribers.append(vel_sub)
+        
+        # Clicked point subscriber for rviz
+        clicked_sub = self.create_subscription(
+            PointStamped,
+            f'/clicked_point',
+            self.goal_callback,
+            10
+        )
+
+        
+        self.path_pub = self.create_publisher(MarkerArray, '/mpc_path', 10)
+        self.robot_pub = self.create_publisher(Marker, '/robot_marker', 10)
+
+        self.get_logger().info('MPC working')
