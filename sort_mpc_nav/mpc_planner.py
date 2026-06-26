@@ -43,8 +43,26 @@ class MPC_Planner(Node):
             10
         )
 
-        
+
         self.path_pub = self.create_publisher(MarkerArray, '/mpc_path', 10)
         self.robot_pub = self.create_publisher(Marker, '/robot_marker', 10)
 
         self.get_logger().info('MPC working')
+
+
+    def goal_callback(self, msg):
+        self.goal_x = msg.point.x
+        self.goal_y = msg.point.y
+        self.get_logger().info(f'New Goal Clicked: x={self.goal_x:.2f}, y={self.goal_y:.2f}')
+
+    def pose_callback(self, msg, idx):
+        if idx not in self.ped_states:
+            self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
+        self.ped_states[idx]['x'] = msg.x
+        self.ped_states[idx]['y'] = msg.y
+
+    def vel_callback(self, msg, idx):
+        if idx not in self.ped_states:
+            self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
+        self.ped_states[idx]['vx'] = msg.x
+        self.ped_states[idx]['vy'] = msg.y
