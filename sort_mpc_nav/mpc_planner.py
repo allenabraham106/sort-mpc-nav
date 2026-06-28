@@ -58,11 +58,28 @@ class MPC_Planner(Node):
     def pose_callback(self, msg, idx):
         if idx not in self.ped_states:
             self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
-        self.ped_states[idx]['x'] = msg.x
-        self.ped_states[idx]['y'] = msg.y
+        self.ped_states[idx]['px'] = msg.x
+        self.ped_states[idx]['py'] = msg.y
 
     def vel_callback(self, msg, idx):
         if idx not in self.ped_states:
             self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
         self.ped_states[idx]['vx'] = msg.x
         self.ped_states[idx]['vy'] = msg.y
+
+    def setup_solver(self):
+        self.N = 10 # how many steps to look ahead
+        self.dt = 0.3 # seconds per step
+        self.max_speed = 1.5 # max speed of robot
+
+        octi = ca.Octi(). # initialize CasADi
+
+        # Decision Variables, robots x,y position at n+1 timesteps
+        X = opti.variables(2, self.N + 1)
+
+        # Parameters 
+        x0 = opti.parameter(2)
+        goal = opti.parameter(2)
+        ped_pred = opti.parameter(2, self.N * self.num_pedestrians)
+
+        
