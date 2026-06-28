@@ -82,4 +82,18 @@ class MPC_Planner(Node):
         goal = opti.parameter(2)
         ped_pred = opti.parameter(2, self.N * self.num_pedestrians)
 
+        # Cost Function
+        cost = 0
+        for k in range(self.N + 1):
+            cost += ca.sumsqr(X[:, k] - goal) # distance to the goal
         
+        for k in range(self.N):
+            cost += ca.sumsqr(X[:, k+1] - X[:, k]) * 0.1 # smoothness buffer
+
+        for k in range(self.N):
+            for p in range(self.num_pedestrians):
+                ped_pos = ped_preds[:, k * self.num_pedestrians + p]
+                dist_sq = ca.sumsqr(X[:, k + 1] - ped_pos)
+                cost += 5.0 / (dist_sq + 0.1) # cost for going close to pedestrians
+
+        optim.minimize(cost)
