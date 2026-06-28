@@ -43,12 +43,10 @@ class MPC_Planner(Node):
             10
         )
 
-
         self.path_pub = self.create_publisher(MarkerArray, '/mpc_path', 10)
         self.robot_pub = self.create_publisher(Marker, '/robot_marker', 10)
 
         self.get_logger().info('MPC working')
-
 
     def goal_callback(self, msg):
         self.goal_x = msg.point.x
@@ -97,3 +95,18 @@ class MPC_Planner(Node):
                 cost += 5.0 / (dist_sq + 0.1) # cost for going close to pedestrians
 
         optim.minimize(cost)
+
+        # Constraints
+        opti.subject_to(X[:, 0] == x0)
+        for k in range(self.N):
+            step = X[:, k + 1] - X[:, k]
+            opti.subject_to(ca.sumsqr(step) <= (self.max_speed * self.dt) ** 2)
+        opti.solver('ipopt', {'print_time': False, 'ipopt.print_level': 0})
+
+
+        self.opti = opti
+        self.X = X
+        self.x0_param = x0
+        self.goal_param = goal
+        self.ped_preds_param = ped_preds
+        
