@@ -52,6 +52,7 @@ class MPC_Planner(Node):
             0.3, 
             self.plan
         )
+        self.publish_initial_robot()
 
     def goal_callback(self, msg):
         self.goal_x = msg.point.x
@@ -91,13 +92,13 @@ class MPC_Planner(Node):
             cost += ca.sumsqr(X[:, k] - goal) # distance to the goal
         
         for k in range(self.N):
-            cost += ca.sumsqr(X[:, k+1] - X[:, k]) * 0.1 # smoothness buffer
+            cost += ca.sumsqr(X[:, k+1] - X[:, k]) * 3.0 # smoothness buffer
 
         for k in range(self.N):
             for p in range(self.num_pedestrians):
                 ped_pos = ped_preds[:, k * self.num_pedestrians + p]
                 dist_sq = ca.sumsqr(X[:, k + 1] - ped_pos)
-                cost += 5.0 / (dist_sq + 0.1) # cost for going close to pedestrians
+                cost += 2.0 / (dist_sq + 0.1) # cost for going close to pedestrians
 
         opti.minimize(cost)
 
@@ -195,6 +196,27 @@ class MPC_Planner(Node):
 
         except Exception as e:
             self.get_logger().warn(f'MPC solve failed: {e}')
+
+    def publish_initial_robot(self):
+        robot_marker = Marker()
+        robot_marker.header.frame_id = 'map'
+        robot_marker.header.stamp = self.get_clock().now().to_msg()
+        robot_marker.ns = 'robot'
+        robot_marker.id = 0
+        robot_marker.type = Marker.CUBE
+        robot_marker.action = Marker.ADD
+        robot_marker.pose.position.x = self.robot_x
+        robot_marker.pose.position.y = self.robot_y
+        robot_marker.pose.position.z = 0.0
+        robot_marker.pose.orientation.w = 1.0
+        robot_marker.scale.x = 0.4
+        robot_marker.scale.y = 0.4
+        robot_marker.scale.z = 0.4
+        robot_marker.color.r = 0.0
+        robot_marker.color.g = 0.5
+        robot_marker.color.b = 1.0
+        robot_marker.color.a = 1.0
+        self.robot_pub.publish(robot_marker)
 
 def main(args = None):
     rclpy.init(args = args)

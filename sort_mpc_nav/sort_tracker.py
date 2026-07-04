@@ -10,7 +10,7 @@ import numpy as np
 class SortTracker(Node):
     def __init__(self):
         super().__init__('sort_tracker')
-        self.num_pedestrians = 3
+        self.num_pedestrians = 7
         self.callback_group = ReentrantCallbackGroup()
 
         # one kalman filter per pedestrian
