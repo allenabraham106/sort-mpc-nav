@@ -48,6 +48,10 @@ class MPC_Planner(Node):
 
         self.get_logger().info('MPC working')
         self.setup_solver()
+        self.timer = self.create_wall_timer(
+            0.3, 
+            self.plan
+        )
 
     def goal_callback(self, msg):
         self.goal_x = msg.point.x
@@ -110,4 +114,98 @@ class MPC_Planner(Node):
         self.x0_param = x0
         self.goal_param = goal
         self.ped_preds_param = ped_preds
+
+    def plan(self):
+        # don't have a goal yet
+        if self.goal_x is None or self.goal_y is None:
+            return
         
+        # don't have pedestrian data
+        if len(self.ped_states) < self.num_pedestrians:
+            return
+
+        # project each pedestrian forward N steps
+        ped_preds = np.zeros((2, self.N * self.num_pedestrians))
+        for p in range(self.num_pedestrians):
+            state = self.ped_states.get(p, {'px': 0.0, 'py': 0.0, 'vx': 0.0, 'vy': 0.0})
+            for k in range(self.N):
+                t = (k + 1) * self.dt
+                col = k * self.num_pedestrians + p
+                ped_preds[0, col] = state['px'] + state['vx'] * t
+                ped_preds[1, col] = state['py'] + state['vy'] * t
+
+        # set parameter values for the solve
+        self.opti.set_value(self.x0_param, [self.robot_x, self.robot_y])
+        self.opti.set_value(self.goal_param, [self.goal_x, self.goal_y])
+        self.opti.set_value(self.ped_preds_param, ped_preds)
+
+        # solve 
+        try: 
+            sol = self.opti.solve()
+            path = sol.value(self.X)
+
+            # update the robot position to the first step of the planned path
+            self.robot_x = path[0,1]
+            self.robot_y = path[1,1]
+
+            # publish path as a marker array
+            marker_array = MarkerArray()
+            for k in range(self.N + 1):
+                m = Marker()
+                m.header.frame_id = 'map'
+                m.header.stamp = self.get_clock().now().to_msg()
+                m.ns = 'mpc_path'
+                m.id = k
+                m.type = Marker.SPHERE
+                m.action = Marker.ADD
+                m.pose.position.x = path[0, k]
+                m.pose.position.y = path[1, k]
+                m.pose.position.z = 0.0
+                m.pose.orientation.w = 1.0
+                m.scale.x = 0.2
+                m.scale.y = 0.2
+                m.scale.z = 0.2
+                m.color.r = 0.0 
+                m.color.g = 1.0
+                m.color.b = 0.0
+                m.color.a = 1.0
+                marker_array.markers.append(m)
+            self.path_pub.publish(marker_array)
+
+            # publish robot marker
+            robot_marker = Marker()
+            robot_marker.header.frame_id = 'map'
+            robot_marker.header.stamp = self.get_clock().now().to_msg()
+            robot_marker.ns = 'robot'
+            robot_marker.id = 0
+            robot_marker.type = Marker.CUBE
+            robot_marker.action = Marker.ADD
+            robot_marker.pose.position.x = self.robot_x
+            robot_marker.pose.position.y = self.robot_y
+            robot_marker.pose.position.z = 0.0
+            robot_marker.pose.orientation.w = 1.0
+            robot_marker.scale.x = 0.4
+            robot_marker.scale.y = 0.4
+            robot_marker.scale.z = 0.4
+            robot_marker.color.r = 0.0
+            robot_marker.color.g = 0.5
+            robot_marker.color.b = 1.0
+            robot_marker.color.a = 1.0
+            self.robot_pub.publish(robot_marker)
+
+        except Exception as e:
+            self.get_logger().warn(f'MPC solve failed: {e}')
+
+def main(args = None):
+    rclpy.init(args = args)
+    node = MPC_Planner()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
