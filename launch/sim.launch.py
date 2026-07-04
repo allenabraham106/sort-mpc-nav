@@ -42,4 +42,11 @@ def generate_launch_description():
             output = 'screen'
         )
 
+        Node(
+            package = 'sort_mpc_nav', 
+            executable = 'mpc_planner.py',
+            name = 'mpc_planner'
+            output = 'screen'
+        )
+
     ])

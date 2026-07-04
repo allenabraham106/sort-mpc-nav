@@ -35,6 +35,7 @@ install(DIRECTORY launch config
 
 install(PROGRAMS
   sort_mpc_nav/sort_tracker.py
+  sort_mpc_nav/mpc_planner.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
