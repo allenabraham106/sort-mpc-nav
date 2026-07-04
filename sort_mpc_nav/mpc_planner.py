@@ -48,7 +48,7 @@ class MPC_Planner(Node):
 
         self.get_logger().info('MPC working')
         self.setup_solver()
-        self.timer = self.create_wall_timer(
+        self.timer = self.create_timer(
             0.3, 
             self.plan
         )
