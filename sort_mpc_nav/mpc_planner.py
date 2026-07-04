@@ -47,6 +47,7 @@ class MPC_Planner(Node):
         self.robot_pub = self.create_publisher(Marker, '/robot_marker', 10)
 
         self.get_logger().info('MPC working')
+        self.setup_solver()
 
     def goal_callback(self, msg):
         self.goal_x = msg.point.x
@@ -70,15 +71,15 @@ class MPC_Planner(Node):
         self.dt = 0.3 # seconds per step
         self.max_speed = 1.5 # max speed of robot
 
-        octi = ca.Octi(). # initialize CasADi
+        opti = ca.Opti() # initialize CasADi
 
         # Decision Variables, robots x,y position at n+1 timesteps
-        X = opti.variables(2, self.N + 1)
+        X = opti.variable(2, self.N + 1)
 
         # Parameters 
         x0 = opti.parameter(2)
         goal = opti.parameter(2)
-        ped_pred = opti.parameter(2, self.N * self.num_pedestrians)
+        ped_preds = opti.parameter(2, self.N * self.num_pedestrians)
 
         # Cost Function
         cost = 0
@@ -94,7 +95,7 @@ class MPC_Planner(Node):
                 dist_sq = ca.sumsqr(X[:, k + 1] - ped_pos)
                 cost += 5.0 / (dist_sq + 0.1) # cost for going close to pedestrians
 
-        optim.minimize(cost)
+        opti.minimize(cost)
 
         # Constraints
         opti.subject_to(X[:, 0] == x0)
