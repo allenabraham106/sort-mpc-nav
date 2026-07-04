@@ -74,7 +74,10 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/sort_mpc_nav" TYPE PROGRAM FILES "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/sort_mpc_nav/sort_tracker.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/sort_mpc_nav" TYPE PROGRAM FILES
+    "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/sort_mpc_nav/sort_tracker.py"
+    "/home/allenabraham106/ros2_ws/src/sort_mpc_nav/sort_mpc_nav/mpc_planner.py"
+    )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)

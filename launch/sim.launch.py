@@ -40,12 +40,12 @@ def generate_launch_description():
             executable = 'sort_tracker.py',
             name = 'sort_tracker',
             output = 'screen'
-        )
+        ),
 
         Node(
             package = 'sort_mpc_nav', 
             executable = 'mpc_planner.py',
-            name = 'mpc_planner'
+            name = 'mpc_planner',
             output = 'screen'
         )
 

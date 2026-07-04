@@ -54,7 +54,7 @@
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 41,
+				"line" : 42,
 				"parent" : 0
 			},
 			{
@@ -275,7 +275,8 @@
 			"destination" : "lib/sort_mpc_nav",
 			"paths" : 
 			[
-				"sort_mpc_nav/sort_tracker.py"
+				"sort_mpc_nav/sort_tracker.py",
+				"sort_mpc_nav/mpc_planner.py"
 			],
 			"type" : "file"
 		},
