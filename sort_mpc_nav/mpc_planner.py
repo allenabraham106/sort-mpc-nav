@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
+from sort_mpc_nav.msg import TrackedPedestrian, TrackedPedestrianArray
 import numpy as np
 import casadi as ca # this is for trajectory planning
 
@@ -12,28 +13,17 @@ class MPC_Planner(Node):
         super().__init__('mpc_planner')
         self.robot_x = 0.0 # where the robot is
         self.robot_y = 0.0
+        self.current_num_peds = 0
         self.goal_x = None # where the user clicked (none until clicked)
         self.goal_y = None
-        self.ped_states = {} # latest positiion + velocity of the pedestrians
-        self.num_pedestrians = 3
+        self.tracked_states = []  # list of tracked states
 
-        # Subscribers for each pedestrians
-        self.subscribers = []
-        for i in range(self.num_pedestrians):
-            pose_sub = self.create_subscription(
-                Point, 
-                f'/tracked_{i}/pose',
-                lambda msg, idx=i: self.pose_callback(msg, idx),
-                10     
-            )
-            vel_sub = self.create_subscription(
-                Point, 
-                f'/tracked_{i}/velocity',
-                lambda msg, idx=i: self.vel_callback(msg, idx),
-                10
-            )
-            self.subscribers.append(pose_sub)
-            self.subscribers.append(vel_sub)
+        self.create_subscription(
+            TrackedPedestrianArray,
+            '/tracked_states',
+            self.tracked_callback,
+            10
+        )
         
         # Clicked point subscriber for rviz
         clicked_sub = self.create_subscription(
@@ -47,7 +37,6 @@ class MPC_Planner(Node):
         self.robot_pub = self.create_publisher(Marker, '/robot_marker', 10)
 
         self.get_logger().info('MPC working')
-        self.setup_solver()
         self.timer = self.create_timer(
             0.3, 
             self.plan
@@ -59,19 +48,10 @@ class MPC_Planner(Node):
         self.goal_y = msg.point.y
         self.get_logger().info(f'New Goal Clicked: x={self.goal_x:.2f}, y={self.goal_y:.2f}')
 
-    def pose_callback(self, msg, idx):
-        if idx not in self.ped_states:
-            self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
-        self.ped_states[idx]['px'] = msg.x
-        self.ped_states[idx]['py'] = msg.y
+    def tracked_callback(self, msg):
+        self.tracked_states = msg.pedestrians
 
-    def vel_callback(self, msg, idx):
-        if idx not in self.ped_states:
-            self.ped_states[idx] = {'px': 0.0, 'py':0.0, 'vx':0.0, 'vy':0.0}
-        self.ped_states[idx]['vx'] = msg.x
-        self.ped_states[idx]['vy'] = msg.y
-
-    def setup_solver(self):
+    def setup_solver(self, num_peds):
         self.N = 10 # how many steps to look ahead
         self.dt = 0.3 # seconds per step
         self.max_speed = 1.5 # max speed of robot
@@ -84,7 +64,7 @@ class MPC_Planner(Node):
         # Parameters 
         x0 = opti.parameter(2)
         goal = opti.parameter(2)
-        ped_preds = opti.parameter(2, self.N * self.num_pedestrians)
+        ped_preds = opti.parameter(2, self.N * num_peds)
 
         # Cost Function
         cost = 0
@@ -95,8 +75,8 @@ class MPC_Planner(Node):
             cost += ca.sumsqr(X[:, k+1] - X[:, k]) * 3.0 # smoothness buffer
 
         for k in range(self.N):
-            for p in range(self.num_pedestrians):
-                ped_pos = ped_preds[:, k * self.num_pedestrians + p]
+            for p in range(num_peds):
+                ped_pos = ped_preds[:, k * num_peds + p]
                 dist_sq = ca.sumsqr(X[:, k + 1] - ped_pos)
                 cost += 2.0 / (dist_sq + 0.1) # cost for going close to pedestrians
 
@@ -122,20 +102,23 @@ class MPC_Planner(Node):
             return
         
         # don't have pedestrian data
-        if len(self.ped_states) < self.num_pedestrians:
+        if len(self.tracked_states) == 0:
             return
 
-        # project each pedestrian forward N steps
-        ped_preds = np.zeros((2, self.N * self.num_pedestrians))
-        for p in range(self.num_pedestrians):
-            state = self.ped_states.get(p, {'px': 0.0, 'py': 0.0, 'vx': 0.0, 'vy': 0.0})
-            for k in range(self.N):
-                t = (k + 1) * self.dt
-                col = k * self.num_pedestrians + p
-                ped_preds[0, col] = state['px'] + state['vx'] * t
-                ped_preds[1, col] = state['py'] + state['vy'] * t
+        num_peds = len(self.tracked_states)
+        
+        if num_peds != self.current_num_peds:
+            self.setup_solver(num_peds)
+            self.current_num_peds = num_peds
 
-        # set parameter values for the solve
+        ped_preds = np.zeros((2, self.N * num_peds))
+        for p, peds in enumerate(self.tracked_states):
+            for k in range(self.N):
+                t = (k+ 1) * self.dt
+                col = k * num_peds + p
+                ped_peds[0, col] = ped.px + ped.vx * t
+                ped_peds[1, col] = ped.py + ped.vy * t
+            
         self.opti.set_value(self.x0_param, [self.robot_x, self.robot_y])
         self.opti.set_value(self.goal_param, [self.goal_x, self.goal_y])
         self.opti.set_value(self.ped_preds_param, ped_preds)
