@@ -5,49 +5,30 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 from filterpy.kalman import KalmanFilter
 from rclpy.callback_groups import ReentrantCallbackGroup
+from geometry_msgs.msg import Point, PoseArray
+from sort_mpc_nav.msg import TrackedPedestrian, TrackedPedestrianArray
 import numpy as np
 
 class SortTracker(Node):
     def __init__(self):
         super().__init__('sort_tracker')
-        self.num_pedestrians = 7
-        self.callback_group = ReentrantCallbackGroup()
+        self.filters = {}
+        self.initialized = {}
 
-        # one kalman filter per pedestrian
-        self.filters = [self.init_kalman_filter() for _ in range(self.num_pedestrians)]
+        # One subscription for all pedestrians
+        self.create_subscription(
+            PoseArray,
+            '/pedestrian_detections',
+            self.detections_callback,
+            10
+        )
 
-        # track if the pedestrain has received its first measurment
-        self.initialized = [False] * self.num_pedestrians
-
-        # subscribers (one per pedestrian)
-        self.subscribers = []
-        for i in range(self.num_pedestrians):
-            sub = self.create_subscription(
-                Point,
-                f'/pedestrian_{i}/pose',
-                lambda msg, idx = i: self.pose_callback(msg, idx),
-                10,
-                callback_group = self.callback_group
-            )
-            self.subscribers.append(sub)
-        
-        # publishers (one per pedestrian)
-        # publishing pose and velocity
-        self.pose_publishers = []
-        self.vel_publishers = []
-        for u in range(self.num_pedestrians):
-            pose_pub = self.create_publisher(
-                Point,
-                f'/tracked_{u}/pose',
-                10
-            )
-            vel_pub = self.create_publisher(
-                Point, 
-                f'/tracked_{u}/velocity',
-                10
-            )
-            self.pose_publishers.append(pose_pub)
-            self.vel_publishers.append(vel_pub)
+        # One publisher for all pedestrians
+        self.tracked_pub = self.create_publisher(
+            TrackedPedestrianArray,
+            '/tracked_states',
+            10
+        )
 
         self.get_logger().info('SORT tracker started')
 
@@ -82,44 +63,48 @@ class SortTracker(Node):
 
         return kf
 
-    def pose_callback(self, msg, idx):
-        kf = self.filters[idx]
+    def detections_callback(self, msg):
+        tracked_array = TrackedPedestrianArray()
+        for i, pose in enumerate(msg.poses):
+            if i not in self.filters:
+                self.filters[i] = self.init_kalman_filter()
+                self.initialized[i] = False
+            
+            kf = self.filters[i]
 
-        # if this is the first measurment, initilize don't update
-        if not self.initialized[idx]:
-            kf.x = np.array([[msg.x], [msg.y], [0.0], [0.0]])
-            self.initialized[idx] = True
-            return
-        
-        # Prediction (step 1 in pose_callback)
-        kf.predict()
+            if not self.initialized[i]:
+                kf.x = np.array([[pose.position.x], [pose.position.y], [0.0], [0.0]])
+                self.initialized[i] = True
+                continue
+            else:
+                kf.predict()
+                measurement = np.array([
+                    [pose.position.x],
+                    [pose.position.y]
+                ])
+                kf.update(measurement)
+                # estimated state
+                px = kf.x[0, 0]
+                py = kf.x[1, 0]
+                vx = kf.x[2, 0]
+                vy = kf.x[3, 0]
 
-        # Update with actual measurements (step 2 in pose_callback)
-        measurement = np.array([
-            [msg.x],
-            [msg.y]
-        ])
-        kf.update(measurement)
+            # extract state
+            px = kf.x[0, 0]
+            py = kf.x[1, 0]
+            vx = kf.x[2, 0]
+            vy = kf.x[3, 0]
 
-        # estimated state
-        px = kf.x[0, 0]
-        py = kf.x[1, 0]
-        vx = kf.x[2, 0]
-        vy = kf.x[3, 0]
+            # build TrackedPedestrian message
+            tracked = TrackedPedestrian()
+            tracked.id = i
+            tracked.px = px
+            tracked.py = py
+            tracked.vx = vx
+            tracked.vy = vy
+            tracked_array.pedestrians.append(tracked)
 
-        # publish estimated pose
-        pose_msg = Point()
-        pose_msg.x = px
-        pose_msg.y = py
-        pose_msg.z = 0.0
-        self.pose_publishers[idx].publish(pose_msg)
-
-        # publish estimated velocity
-        vel_msg = Point()
-        vel_msg.x = vx
-        vel_msg.y = vy
-        vel_msg.z = 0.0
-        self.vel_publishers[idx].publish(vel_msg)
+        self.tracked_pub.publish(tracked_array)
 
 def main(args = None):
     rclpy.init(args = args)
