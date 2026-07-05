@@ -2,34 +2,42 @@
 
 namespace sort_mpc_nav{
   PedestrianSim::PedestrianSim() : Node("pedestrian_sim"){
-    pedestrians_ = {
-        {0.0,  0.0,  0.5,  0.2},
-        {3.0,  1.0, -0.3,  0.4},
-        {1.5, -2.0,  0.1, -0.5},
-        {-2.0,  1.5,  0.4,  0.3},
-        {2.5, -1.0, -0.2, -0.4},
-        {-1.0, -3.0,  0.3,  0.5},
-        {4.0,  2.0, -0.4, -0.3},
-    };
 
-    for(size_t i = 0; i < pedestrians_.size(); ++i){
-        std::string topic = "/pedestrian_" + std::to_string(i) + "/pose";
-        auto pub = create_publisher<geometry_msgs::msg::Point>(topic, 10);
-        publishers_.push_back(pub); // store it safely
-    };
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<double> pos_dist(-4.0, 4.0);
+    std::uniform_real_distribution<double> vel_dist(-0.5, 0.5);
+    for(int i = 0; i < 7; ++i){
+      pedestrians_.push_back({
+        pos_dist(rng),
+        pos_dist(rng),
+        vel_dist(rng),
+        vel_dist(rng)
+      });
+    }
+
+    detection_pub_ = create_publisher<geometry_msgs::msg::PoseArray>(
+      "/pedestrian_detections",
+      10 
+    );
 
     timer_ = create_wall_timer(
         std::chrono::milliseconds(100),
         std::bind(&PedestrianSim::update, this)
     );
 
-    marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/pedestrian_markers", 10);
+    marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(
+      "/pedestrian_markers",
+      10
+    );
 
     RCLCPP_INFO(get_logger(), "Pedestian simulation started with %zu pedestrians", pedestrians_.size());
   }
 
   void PedestrianSim::update(){
     visualization_msgs::msg::MarkerArray marker_array;
+    geometry_msgs::msg::PoseArray pose_array;
+    pose_array.header.frame_id = "map";
+    pose_array.header.stamp = this->now();
     for(size_t i = 0; i < pedestrians_.size(); ++i){
       visualization_msgs::msg::Marker marker;
       // looping through the movements based on the the relation based on the velocity and original position
@@ -37,9 +45,11 @@ namespace sort_mpc_nav{
       pedestrians_[i].x += pedestrians_[i].vx * 0.1; 
       pedestrians_[i].y += pedestrians_[i].vy * 0.1;
 
-      geometry_msgs::msg::Point msg;
-      msg.x = pedestrians_[i].x;
-      msg.y = pedestrians_[i].y;
+      geometry_msgs::msg::Pose pose; 
+      pose.position.x = pedestrians_[i].x; 
+      pose.position.y = pedestrians_[i].y; 
+      pose.position.z = 0.0;
+      pose_array.poses.push_back(pose);
 
       marker.header.frame_id = "map";
       marker.header.stamp = this->now();
@@ -71,10 +81,10 @@ namespace sort_mpc_nav{
         pedestrians_[i].vy *= -1.0;
       }
       
-      publishers_[i]->publish(msg);
       marker_array.markers.push_back(marker);
     }
     marker_pub_->publish(marker_array);
+    detection_pub_->publish(pose_array);
   }
 }
 
