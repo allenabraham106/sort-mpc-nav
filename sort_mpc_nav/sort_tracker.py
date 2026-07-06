@@ -102,7 +102,7 @@ class SortTracker(Node):
             tracked.py = py
             tracked.vx = vx
             tracked.vy = vy
-            tracked_array.pedestrians.append(tracked)
+            tracked_array.pedestrian.append(tracked)
 
         self.tracked_pub.publish(tracked_array)
 
@@ -111,7 +111,7 @@ def main(args = None):
     node = SortTracker()
     try: 
         rclpy.spin(node)
-    except KeyboardInterupt: 
+    except KeyboardInterrupt: 
         pass
     finally: 
         node.destroy_node()

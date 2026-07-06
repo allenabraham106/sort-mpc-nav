@@ -49,7 +49,7 @@ class MPC_Planner(Node):
         self.get_logger().info(f'New Goal Clicked: x={self.goal_x:.2f}, y={self.goal_y:.2f}')
 
     def tracked_callback(self, msg):
-        self.tracked_states = msg.pedestrians
+        self.tracked_states = msg.pedestrian
 
     def setup_solver(self, num_peds):
         self.N = 10 # how many steps to look ahead
@@ -206,7 +206,7 @@ def main(args = None):
     node = MPC_Planner()
     try:
         rclpy.spin(node)
-    except KeyboardInterupt:
+    except KeyboardInterrupt:
         pass
     finally:
         node.destroy_node()
