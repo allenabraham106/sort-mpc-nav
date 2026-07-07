@@ -116,8 +116,8 @@ class MPC_Planner(Node):
             for k in range(self.N):
                 t = (k+ 1) * self.dt
                 col = k * num_peds + p
-                ped_peds[0, col] = ped.px + ped.vx * t
-                ped_peds[1, col] = ped.py + ped.vy * t
+                ped_preds[0, col] = peds.px + peds.vx * t
+                ped_preds[1, col] = peds.py + peds.vy * t
             
         self.opti.set_value(self.x0_param, [self.robot_x, self.robot_y])
         self.opti.set_value(self.goal_param, [self.goal_x, self.goal_y])
