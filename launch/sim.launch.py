@@ -49,4 +49,11 @@ def generate_launch_description():
             output = 'screen'
         )
 
+        Node(
+            package='sort_mpc_nav',
+            executable='metrics_logger.py',
+            name='metrics_logger',
+            output='screen'
+        ),
+
     ])
